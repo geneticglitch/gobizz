@@ -7,7 +7,7 @@ export function Navbar_Component() {
   const { data: session } = useSession();
 
   return (
-    <Navbar className = "bg-blue-300" fluid rounded>
+    <Navbar className = "bg-white" fluid rounded>
       <Navbar.Brand>
         <img src="/globe.svg" className="mr-3 h-6 sm:h-9" alt="logo" />
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white text-black">
@@ -43,11 +43,11 @@ export function Navbar_Component() {
         <Navbar.Toggle />
       </div>
       <Navbar.Collapse>
-        <Navbar.Link className = "text-lg" href="#">
+        <Navbar.Link className = "text-lg" href="/">
           Home
         </Navbar.Link>
-        <Navbar.Link className = "text-lg" href="#">About</Navbar.Link>
-        <Navbar.Link className = "text-lg" href="#">Explore</Navbar.Link>
+        <Navbar.Link className = "text-lg" href="/about">About</Navbar.Link>
+        <Navbar.Link className = "text-lg" href="/explore">Explore</Navbar.Link>
         <Navbar.Link className = "text-lg" href="/dashboard">Dashboard</Navbar.Link>
       </Navbar.Collapse>
     </Navbar>
