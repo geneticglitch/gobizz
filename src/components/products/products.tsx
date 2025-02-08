@@ -2,7 +2,7 @@
 import { Button, Label, Modal, TextInput } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { get_products, create_product } from "./server_actions";
+import { get_products, create_product, update_product_stock } from "./server_actions";
 import { get_items } from "../items/server_actions";
 
 const Products: React.FC<any> = () => {
@@ -19,11 +19,14 @@ const Products: React.FC<any> = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       if (!userId) return;
+      await update_product_stock(userId);
       const fetchedProducts = await get_products(userId);
       setProducts(fetchedProducts.products || []);
       fetchItems();
+      
     };
     fetchProducts();
+
   }, [userId]);
 
   const fetchItems = async () => {

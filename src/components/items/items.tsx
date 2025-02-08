@@ -1,19 +1,26 @@
-"use client"
-import { Button, Label, Modal, TextInput } from 'flowbite-react';
-import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
-import { get_items, create_item, delete_item  } from './server_actions';
+"use client";
+import { Button, Label, Modal, TextInput } from "flowbite-react";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { get_items, create_item, delete_item, update_item } from "./server_actions";
 
 const Items: React.FC<any> = () => {
   const { data: session } = useSession();
   const userId = session?.user?.id;
   const [items, setItems] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newItemName, setNewItemName] = useState('');
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [newItemName, setNewItemName] = useState("");
   const [quantity, setQuantity] = useState<number>(1);
-  const [unit, setUnit] = useState('');
+  const [unit, setUnit] = useState("");
   const [totalCost, setTotalCost] = useState<number>(0);
-  const [editingitem, setEditingItem] = useState<{ id: string; quantity: Number; totalCost: number} | null>(null);
+  const [editingItem, setEditingItem] = useState<{
+    id: string;
+    name: string;
+    quantity: number;
+    unit: string;
+    totalCost: number;
+  } | null>(null);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -32,17 +39,18 @@ const Items: React.FC<any> = () => {
 
     await create_item(newItemName, quantity, unit, totalCost, userId!);
     setIsModalOpen(false);
-    
+
     // Clear input fields
-    setNewItemName('');
+    setNewItemName("");
     setQuantity(1);
-    setUnit('');
+    setUnit("");
     setTotalCost(0);
 
     // Fetch updated items
     const fetchedItems = await get_items(userId!);
     setItems(fetchedItems.items || []);
   };
+
   const handleRemoveItem = async (itemId: string) => {
     if (window.confirm("Are you sure you want to delete this item?")) {
       try {
@@ -52,12 +60,66 @@ const Items: React.FC<any> = () => {
           return;
         }
         setItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
-        const fetchedItems = await get_items(userId!);
-        setItems(fetchedItems.items || []);
       } catch (error) {
         console.error("Error deleting item:", error);
         alert("Failed to delete item because it is currently being used in a product.");
       }
+    }
+  };
+
+  const handleEditItem = (item: any) => {
+    setEditingItem(item);
+    setIsEditModalOpen(true);
+
+  };
+
+  const handleSaveEdit = async () => {
+    if (
+      !editingItem ||
+      !editingItem.name ||
+      editingItem.quantity <= 0 ||
+      !editingItem.unit ||
+      editingItem.totalCost <= 0
+    ) {
+      alert("Please enter valid item details.");
+      return;
+    }
+
+    try {
+      const response = await update_item(
+        editingItem.id,
+        editingItem.name,
+        editingItem.quantity,
+        editingItem.unit,
+        editingItem.totalCost
+      );
+      if (!response.success) {
+        alert(response.error);
+        return;
+      }
+
+      // Update the state with the edited item
+      setItems((prevItems) =>
+        prevItems.map((item) =>
+          item.id === editingItem.id
+            ? {
+                ...item,
+                name: editingItem.name,
+                quantity: editingItem.quantity,
+                unit: editingItem.unit,
+                totalCost: editingItem.totalCost,
+              }
+            : item
+        )
+      );
+
+      // Close the edit modal
+      setIsEditModalOpen(false);
+      setEditingItem(null);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating item:", error);
+      alert("Failed to update item. Please try again.");
     }
   };
 
@@ -71,7 +133,7 @@ const Items: React.FC<any> = () => {
       <ul className="mt-4 space-y-2">
         {items.map((item) => (
           <li key={item.id} className="p-2 border rounded">
-            <div className="grid grid-cols-4 gap-4 items-center ">
+            <div className="grid grid-cols-4 gap-4 items-center">
               <div className="flex items-center justify-center">
                 <h2>{item.name}</h2>
               </div>
@@ -79,63 +141,48 @@ const Items: React.FC<any> = () => {
               <div className="flex items-center justify-center">
                 <h2>{item.quantity} {item.unit}</h2>
               </div>
+
               <div className="flex items-center justify-center">
-              <h2>${item.totalCost.toFixed(2)}</h2>
+                <h2>${item.totalCost.toFixed(2)}</h2>
               </div>
 
               <div className="flex items-center justify-end space-x-2">
-                  <Button color="red" onClick={() => handleRemoveItem(item.id)}>
-                    Remove
-                  </Button>
-            <button className="text-blue-500 hover:text-blue-700">
-             <i className="fas fa-edit"></i>
-            </button>
-          </div>
-
-              <div className="flex items-center justify-end space-x-2">
-                <button className="text-blue-500 hover:text-blue-700">
-                  <i className="fas fa-edit"></i>
-                </button>
-                <button className="text-red-500 hover:text-red-700">
-                  <i className="fas fa-trash"></i>
-                </button>
+                <Button color="blue" onClick={() => handleEditItem(item)}>
+                  Edit
+                </Button>
+                <Button color="red" onClick={() => handleRemoveItem(item.id)}>
+                  Remove
+                </Button>
               </div>
             </div>
           </li>
         ))}
       </ul>
 
+      {/* Add New Item Modal */}
       <Modal show={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <Modal.Header>Add New Item</Modal.Header>
         <Modal.Body>
-          <Label>
-            Item Name
-          </Label>
+          <Label>Item Name</Label>
           <TextInput
             value={newItemName}
             onChange={(e) => setNewItemName(e.target.value)}
             required
           />
-          <Label>
-            Quanitity
-          </Label>
+          <Label>Quantity</Label>
           <TextInput
             type="number"
             value={quantity}
             onChange={(e) => setQuantity(parseFloat(e.target.value))}
             placeholder="Quantity"
           />
-          <Label>
-            Quanitity Unit
-          </Label>
+          <Label>Quantity Unit</Label>
           <TextInput
             value={unit}
             onChange={(e) => setUnit(e.target.value)}
             placeholder="Unit (e.g., kg, pcs, liter)"
           />
-           <Label>
-            Price
-          </Label>
+          <Label>Price</Label>
           <TextInput
             type="number"
             value={totalCost}
@@ -144,13 +191,58 @@ const Items: React.FC<any> = () => {
           />
         </Modal.Body>
         <Modal.Footer>
-        <Button onClick={handleCreateItem}>Add</Button>
-        <Button color="grey" onClick={() => setIsModalOpen(false)}>
-          Cancel
+          <Button onClick={handleCreateItem}>Add</Button>
+          <Button color="gray" onClick={() => setIsModalOpen(false)}>
+            Cancel
           </Button>
         </Modal.Footer>
-        
-        
+      </Modal>
+
+      {/* Edit Item Modal */}
+      <Modal show={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
+        <Modal.Header>Edit Item</Modal.Header>
+        <Modal.Body>
+          <Label>Item Name</Label>
+          <TextInput
+            value={editingItem?.name || ""}
+            onChange={(e) =>
+              setEditingItem({ ...editingItem!, name: e.target.value })
+            }
+            required
+          />
+          <Label>Quantity</Label>
+          <TextInput
+            type="number"
+            value={editingItem?.quantity || 0}
+            onChange={(e) =>
+              setEditingItem({ ...editingItem!, quantity: parseFloat(e.target.value) })
+            }
+            placeholder="Quantity"
+          />
+          <Label>Quantity Unit</Label>
+          <TextInput
+            value={editingItem?.unit || ""}
+            onChange={(e) =>
+              setEditingItem({ ...editingItem!, unit: e.target.value })
+            }
+            placeholder="Unit (e.g., kg, pcs, liter)"
+          />
+          <Label>Price</Label>
+          <TextInput
+            type="number"
+            value={editingItem?.totalCost || 0}
+            onChange={(e) =>
+              setEditingItem({ ...editingItem!, totalCost: parseFloat(e.target.value) })
+            }
+            placeholder="Total Cost"
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleSaveEdit}>Save</Button>
+          <Button color="gray" onClick={() => setIsEditModalOpen(false)}>
+            Cancel
+          </Button>
+        </Modal.Footer>
       </Modal>
     </div>
   );

@@ -1,6 +1,52 @@
 "use server"
 import  prisma  from "@/lib/prisma";
 
+
+export const update_product_stock = async (userId: string) => {
+  try {
+    const products = await prisma.product.findMany({
+      where: { userId },
+      include: {
+        productItems: {
+          include: {
+            item: true,
+          },
+        },
+      },
+    });
+
+    for (const product of products) {
+      let possibleStocks: number[] = [];
+
+      for (const productItem of product.productItems) {
+        const availableQty = productItem.item.quantity;
+        const requiredQty = productItem.quantity; 
+
+        if (availableQty < requiredQty) {
+          possibleStocks.push(0);
+        } else {
+          possibleStocks.push(Math.floor(availableQty / requiredQty));
+        }
+      }
+
+      const updatedStock = possibleStocks.length > 0 ? Math.min(...possibleStocks) : 0;
+
+      // Update product stock if changed
+      if (updatedStock !== product.stock) {
+        await prisma.product.update({
+          where: { id: product.id },
+          data: { stock: updatedStock },
+        });
+      }
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating product stock:", error);
+    return { success: false, error: "Failed to update product stock" };
+  }
+};
+
 export const create_product = async (
   name: string,
   description: string | null,
@@ -23,7 +69,7 @@ export const create_product = async (
           ...item,
           requiredQuantity: pi.quantity
         };
-      })
+      }) 
     );
 
     let initialStock = 0;
