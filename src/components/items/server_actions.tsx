@@ -32,4 +32,15 @@ export const get_items = async (userId: string) => {
     console.error('An error occurred while getting the items:', error);
     return { status: 400, error: 'An error occurred while getting the items.' };
   }
+  export const delete_item = async (itemId: string) => {
+    try {
+      await prisma.item.delete({
+        where: { id: itemId },
+      });
+      return { success: true };
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      return { success: false, error: "Failed to delete item." };
+    }
+  }
 }

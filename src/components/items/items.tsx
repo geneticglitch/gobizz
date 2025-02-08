@@ -53,6 +53,7 @@ const Items: React.FC<any> = () => {
       <ul className="mt-4 space-y-2">
         {items.map((item) => (
           <li key={item.id} className="p-2 border rounded">
+            
             {item.name} - {item.quantity} {item.unit} - ${item.totalCost.toFixed(2)}
           </li>
         ))}
