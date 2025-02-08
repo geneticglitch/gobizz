@@ -12,11 +12,18 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 enum UserType {
   LOCAL
   GOOGLE
 }
 
+enum OrderStatus {
+  PENDING
+  INPROGRESS
+  COMPLETED
+  CANCELED
+}
 
 model User {
   id        String   @id @default(cuid())
@@ -25,4 +32,66 @@ model User {
   password  String?  
   image     String   @default("/default.jpg")
   type      UserType
+  business  Business?
+}
+
+model Business {
+  id       String   @id @default(cuid())
+  name     String
+  owner    User     @relation(fields: [ownerId], references: [id])
+  ownerId  String   @unique
+  items    Item[]
+  products Product[]
+  orders   Order[]
+}
+
+model Item {
+  id          String       @id @default(cuid())
+  name        String
+  quantity    Float
+  unit        String       // Example: kg, g, liter
+  business    Business     @relation(fields: [businessId], references: [id])
+  businessId  String
+  productItems ProductItem[]
+}
+
+model Product {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  important   Int
+  business    Business     @relation(fields: [businessId], references: [id])
+  businessId  String
+  productItems ProductItem[]
+  orderProducts OrderProduct[]
+}
+
+model ProductItem {
+  id         String  @id @default(cuid())
+  product    Product @relation(fields: [productId], references: [id])
+  productId  String
+  item       Item    @relation(fields: [itemId], references: [id])
+  itemId     String
+  quantity   Float   // How much of this item is needed per product
+}
+
+model Order {
+  id          String       @id @default(cuid())
+  customer    String
+  createdAt   DateTime     @default(now())
+  status      OrderStatus
+  business    Business     @relation(fields: [businessId], references: [id])
+  businessId  String
+  orderProducts OrderProduct[]
+  bill        Float
+}
+
+model OrderProduct {
+  id         String  @id @default(cuid())
+  order      Order   @relation(fields: [orderId], references: [id])
+  orderId    String
+  product    Product @relation(fields: [productId], references: [id])
+  productId  String
+  quantity   Int
 }

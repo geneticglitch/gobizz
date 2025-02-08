@@ -1,6 +1,9 @@
+"use client"
+
 import React from 'react';
 
 const Dashboard = () => {
+    
   return (
     <div className="h-full flex p-8 gap-10">
   <div className="flex-1 bg-white text-black rounded-xl p-4 border border-white-800">
