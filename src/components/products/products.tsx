@@ -13,7 +13,6 @@ const Products: React.FC<any> = () => {
   const [newProductName, setNewProductName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<number>(0);
-  const [stock, setStock] = useState<number>(1);
   const [additionalItems, setAdditionalItems] = useState<{ itemId: string; itemName: string; quantity: number }[]>([]);
   const [items, setItems] = useState<any[]>([]);
 
@@ -33,13 +32,24 @@ const Products: React.FC<any> = () => {
     setItems(fetchedItems.items || []);
   };
 
+  useEffect(() => {
+    fetchItems();
+  }
+    , []);
+
+ 
+
   const handleCreateProduct = async () => {
-    if (!newProductName || price <= 0 || stock < 0) {
+    if (!newProductName || price <= 0) {
       alert("Please enter valid product details.");
       return;
     }
 
-    // Filter out invalid items (where either id or quantity is missing/invalid)
+    if (additionalItems.length === 0) {
+      alert("Please add at least one required item.");
+      return;
+    }
+
     const validItems = additionalItems.filter(
       item => item.itemId && item.itemId !== "" && item.quantity > 0
     ).map(item => ({
@@ -48,25 +58,26 @@ const Products: React.FC<any> = () => {
     }));
 
     try {
-      await create_product(
+      const response = await create_product(
         newProductName,
         description,
         price,
-        stock,
         userId!,
-        validItems // Pass the items array to your server action
+        validItems
       );
-      
+
+      if (!response.success) {
+        alert(response.error);
+        return;
+      }
+
       setIsModalOpen(false);
 
-      // Clear input fields
       setNewProductName("");
       setDescription("");
       setPrice(0);
-      setStock(1);
       setAdditionalItems([]);
 
-      // Fetch updated products
       const fetchedProducts = await get_products(userId!);
       setProducts(fetchedProducts.products || []);
     } catch (error) {
@@ -107,21 +118,33 @@ const Products: React.FC<any> = () => {
 
       <ul className="mt-4 space-y-2">
         {products.map((product) => (
-          <li key={product.id} className="p-4 border rounded shadow-sm">
-            <div className="font-medium">{product.name}</div>
-            <div className="text-sm text-black">
-              Stock: {product.stock} | Price: ${product.price.toFixed(2)}
+          <li key={product.id} className="p-4 border rounded shadow-sm bg-white">
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="font-medium text-lg">{product.name}</div>
+                <div className="text-sm mt-1">
+                  <span className={`font-medium ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    Stock: {product.stock}
+                  </span>
+                  <span className="mx-2">|</span>
+                  <span>Price: ${product.price.toFixed(2)}</span>
+                </div>
+                {product.description && (
+                  <div className="text-sm text-gray-500 mt-1">{product.description}</div>
+                )}
+              </div>
             </div>
-            {product.description && (
-              <div className="text-sm text-gray-500 mt-1">{product.description}</div>
-            )}
+            
             {product.productItems && product.productItems.length > 0 && (
-              <div className="mt-2">
-                <div className="text-sm font-medium">Required Items:</div>
-                <ul className="text-sm text-gray-600">
+              <div className="mt-3 border-t pt-2">
+                <div className="text-sm font-medium">Required Materials per Product:</div>
+                <ul className="text-sm space-y-1 mt-1">
                   {product.productItems.map((pi: any) => (
-                    <li key={pi.id}>
-                      <span className="font-medium">{pi.item.name}</span> ({pi.item.id}): {pi.quantity} {pi.item.unit}
+                    <li key={pi.id} className="flex items-center justify-between">
+                      <span>{pi.item.name} - {pi.quantity} {pi.item.unit}</span>
+                      <span className={`${pi.item.quantity >= pi.quantity ? 'text-green-600' : 'text-red-600'}`}>
+                        Available: {pi.item.quantity} {pi.item.unit}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -164,17 +187,7 @@ const Products: React.FC<any> = () => {
             </div>
 
             <div>
-              <Label>Stock</Label>
-              <TextInput 
-                type="number" 
-                value={stock} 
-                onChange={(e) => setStock(parseInt(e.target.value))} 
-                placeholder="Product stock" 
-              />
-            </div>
-
-            <div>
-              <Label>Required Items</Label>
+              <Label>Required Materials</Label>
               <div className="space-y-3">
                 {additionalItems.map((item, index) => (
                   <div key={index} className="flex items-center space-x-2">
@@ -183,10 +196,10 @@ const Products: React.FC<any> = () => {
                       onChange={(e) => handleAdditionalItemChange(index, "itemId", e.target.value)}
                       className="border-2 p-2 rounded-lg flex-1 text-black"
                     >
-                      <option value="">Select Item</option>
+                      <option value="">Select Material</option>
                       {items.map((i) => (
                         <option key={i.id} value={i.id}>
-                          {i.name}
+                          {i.name} ({i.quantity} {i.unit} available)
                         </option>
                       ))}
                     </select>
@@ -194,7 +207,7 @@ const Products: React.FC<any> = () => {
                       type="number"
                       value={item.quantity}
                       onChange={(e) => handleAdditionalItemChange(index, "quantity", parseInt(e.target.value))}
-                      placeholder="Quantity"
+                      placeholder="Amount needed"
                       className="flex-1"
                     />
                     <Button color="gray" onClick={() => removeAdditionalItem(index)}>
@@ -204,7 +217,7 @@ const Products: React.FC<any> = () => {
                 ))}
               </div>
               <Button className="mt-3" onClick={addAdditionalItem}>
-                Add Required Item
+                Add Material
               </Button>
             </div>
           </div>

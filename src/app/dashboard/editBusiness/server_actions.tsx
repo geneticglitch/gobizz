@@ -6,11 +6,11 @@ export const create_buisness = async (business_name: string | null, business_des
   try {
     await prisma.user.create({
       data: {
-        name,
-        description,
-        address,
-        phonenumber,
-        tags,
+        business_name,
+        business_description,
+        business_address,
+        business_phonenumber,
+        business_tags,
       },
     });
     return { status: 200 };
