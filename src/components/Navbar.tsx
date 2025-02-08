@@ -9,7 +9,7 @@ export function Navbar_Component() {
   return (
     <Navbar className = "bg-white" fluid rounded>
       <Navbar.Brand>
-        <img src="/globe.svg" className="mr-3 h-6 sm:h-9" alt="logo" />
+        <img src="/logo.png" className="mr-3 h-6 sm:h-9" alt="logo" />
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white text-black">
           GoBizz
         </span>
@@ -23,7 +23,7 @@ export function Navbar_Component() {
             label={
               <Avatar
                 alt="User settings"
-                img={session?.user?.image || "/default.jpg"}
+                img={session?.user?.image || "/logo.png"}
                 rounded
               />
             }
