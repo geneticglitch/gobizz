@@ -67,6 +67,7 @@ const Orders: React.FC<any> = () => {
 
       const fetchedOrders = await get_orders(userId!);
       setOrders(fetchedOrders.orders || []);
+      window.location.reload();
     } catch (error) {
       console.error("Error creating order:", error);
       alert("Failed to create order. Please try again.");

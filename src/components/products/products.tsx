@@ -83,6 +83,7 @@ const Products: React.FC<any> = () => {
 
       const fetchedProducts = await get_products(userId!);
       setProducts(fetchedProducts.products || []);
+     
     } catch (error) {
       console.error("Error creating product:", error);
       alert("Failed to create product. Please try again.");

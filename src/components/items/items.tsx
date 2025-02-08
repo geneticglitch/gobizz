@@ -49,6 +49,7 @@ const Items: React.FC<any> = () => {
     // Fetch updated items
     const fetchedItems = await get_items(userId!);
     setItems(fetchedItems.items || []);
+    window.location.reload();
   };
 
   const handleRemoveItem = async (itemId: string) => {
@@ -60,6 +61,7 @@ const Items: React.FC<any> = () => {
           return;
         }
         setItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
+        window.location.reload();
       } catch (error) {
         console.error("Error deleting item:", error);
         alert("Failed to delete item because it is currently being used in a product.");

@@ -8,7 +8,7 @@ export function Navbar_Component() {
 
   return (
     <Navbar className = "bg-white" fluid rounded>
-      <Navbar.Brand>
+      <Navbar.Brand href="/">
         <img src="/logo.png" className="mr-3 h-6 sm:h-9" alt="logo" />
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white text-black">
           GoBizz
