@@ -33,7 +33,7 @@ export function Navbar_Component() {
               <span className="block text-sm">{session?.user?.name}</span>
               <span className="block truncate text-sm font-medium">{session?.user?.email}</span>
             </Dropdown.Header>
-            <Dropdown.Item>Edit Business</Dropdown.Item>
+            <Dropdown.Item href = "/dashboard/editBusiness">Edit Business</Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item onClick={() => signOut()}>Sign out</Dropdown.Item>
           </Dropdown>
@@ -53,3 +53,4 @@ export function Navbar_Component() {
     </Navbar>
   );
 }
+export default Navbar_Component;

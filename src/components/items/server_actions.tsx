@@ -2,7 +2,7 @@
 
 import  prisma  from '@/lib/prisma';
 
-export const create_item = async (name: string,quantity:number ,unit:string , totalCost: number, user_id: number) => {
+export const create_item = async (name: string,quantity:number ,unit:string , totalCost: number, userId: string) => {
   try {
     await prisma.item.create({
       data: {
@@ -10,7 +10,7 @@ export const create_item = async (name: string,quantity:number ,unit:string , to
         totalCost,
         quantity,
         unit,
-        user_id
+        userId
       },
     });
     return { status: 200 };
@@ -19,3 +19,17 @@ export const create_item = async (name: string,quantity:number ,unit:string , to
     return { status: 400, error: 'An error occurred while creating the item.' };
   }
 };
+
+export const get_items = async (userId: string) => {
+  try {
+    const items = await prisma.item.findMany({
+      where: {
+        userId,
+      },
+    });
+    return { status: 200, items };
+  } catch (error) {
+    console.error('An error occurred while getting the items:', error);
+    return { status: 400, error: 'An error occurred while getting the items.' };
+  }
+}

@@ -19,6 +19,12 @@ model User {
   password  String?
   image     String    @default("/default.jpg")
   type      UserType
+  business_name        String?
+  business_description String?
+  business_address     String?
+  business_phonenumber String?
+  business_tags        String[] @default([])
+
 
   // A user can have multiple items, products, and orders
   items     Item[]
@@ -31,7 +37,7 @@ model Item {
   name        String
   quantity    Float
   unit        String   
-  totalCost  Float 
+  totalCost  Int 
   user        User        @relation(fields: [userId], references: [id])
   userId      String
 
@@ -43,7 +49,7 @@ model Product {
   name         String
   description  String?
   price        Float
-  important    Int
+  stock       Int
   user         User         @relation(fields: [userId], references: [id])
   userId       String
 
