@@ -12,72 +12,55 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
-enum UserType {
-  LOCAL
-  GOOGLE
-}
-
-enum OrderStatus {
-  PENDING
-  INPROGRESS
-  COMPLETED
-  CANCELED
-}
-
 model User {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String
-  email     String   @unique
-  password  String?  
-  image     String   @default("/default.jpg")
+  email     String    @unique
+  password  String?
+  image     String    @default("/default.jpg")
   type      UserType
-  business  Business?
+
+  // A user can have multiple items, products, and orders
   items     Item[]
   products  Product[]
   orders    Order[]
 }
 
-model Business {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  address     String?
-  phonenumber String
-  tags        String[] @default([])
-  owner       User?    @relation(fields: [ownerId], references: [id])
-  ownerId     String? @unique
-}
-
 model Item {
-  id         String      @id @default(cuid())
-  name       String
-  quantity   Float
-  unit       String      // Example: kg, g, liter
-  user       User        @relation(fields: [userId], references: [id])
-  userId     String
-  productItems ProductItem[]
+  id          String       @id @default(cuid())
+  name        String
+  quantity    Float
+  unit        String   
+  totalCost  Float 
+  user        User        @relation(fields: [userId], references: [id])
+  userId      String
+
+  productItems ProductItem[] @relation("ItemToProductItem") // ✅ Fixed
 }
 
 model Product {
-  id          String       @id @default(cuid())
-  name        String
-  description String?
-  price       Float
-  important   Int
-  user        User         @relation(fields: [userId], references: [id])
-  userId      String
-  productItems ProductItem[]
+  id           String       @id @default(cuid())
+  name         String
+  description  String?
+  price        Float
+  important    Int
+  user         User         @relation(fields: [userId], references: [id])
+  userId       String
+
+  productItems  ProductItem[] @relation("ProductToProductItem") // ✅ Fixed
   orderProducts OrderProduct[]
 }
 
 model ProductItem {
   id         String  @id @default(cuid())
-  product    Product @relation(fields: [productId], references: [id])
+
+  product    Product @relation(name: "ProductToProductItem", fields: [productId], references: [id])
   productId  String
-  item       Item    @relation(fields: [itemId], references: [id])
+
+  item       Item    @relation(name: "ItemToProductItem", fields: [itemId], references: [id])
   itemId     String
-  quantity   Float   // How much of this item is needed per product
+
+  quantity   Float   
 }
 
 model Order {
@@ -87,6 +70,7 @@ model Order {
   status      OrderStatus
   user        User         @relation(fields: [userId], references: [id])
   userId      String
+
   orderProducts OrderProduct[]
   bill        Float
 }
@@ -98,4 +82,17 @@ model OrderProduct {
   product    Product @relation(fields: [productId], references: [id])
   productId  String
   quantity   Int
+}
+
+// Enums
+enum UserType {
+  LOCAL
+  GOOGLE
+}
+
+enum OrderStatus {
+  PENDING
+  INPROGRESS
+  COMPLETED
+  CANCELED
 }

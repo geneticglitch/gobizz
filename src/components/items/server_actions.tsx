@@ -2,12 +2,14 @@
 
 import  prisma  from '@/lib/prisma';
 
-export const create_item = async (name: string, price: number, user_id: number) => {
+export const create_item = async (name: string,quantity:number ,unit:string , totalCost: number, user_id: number) => {
   try {
-    await prisma.create({
+    await prisma.item.create({
       data: {
         name,
-        price,
+        totalCost,
+        quantity,
+        unit,
         user_id
       },
     });
