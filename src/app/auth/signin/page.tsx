@@ -25,7 +25,7 @@ export default function SignIn() {
     };
 
     return (
-        <section className="bg-gray-50 min-h-screen flex items-center justify-center text-black">
+        <section className="bg-gray-50 h-[93vh] flex items-center justify-center text-black">
             <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
                 <h1 className="text-2xl font-bold text-gray-900 text-center">Sign in</h1>
                 <form className="space-y-4 mt-4">
