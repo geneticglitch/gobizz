@@ -3,7 +3,8 @@ import { Button, Label, Modal, TextInput } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { get_products } from "../products/server_actions";
-import { create_order, get_orders } from "./server_actions";
+import { create_order, get_orders , update_order_status } from "./server_actions";
+import { OrderStatus } from "@prisma/client";
 
 const Orders: React.FC<any> = () => {
   const { data: session } = useSession();
@@ -86,6 +87,19 @@ const Orders: React.FC<any> = () => {
     }
     setOrderProducts(updatedProducts);
   };
+  
+  type OrderStatus = "PENDING" | "INPROGRESS" | "COMPLETED" | "DELIVERING" | "DELIVERED" | "CANCELED";
+
+  const handleStatusChange = async (orderId: string, status: OrderStatus) => {
+    try {
+      await update_order_status(orderId, status);
+      const fetchedOrders = await get_orders(userId!);
+      setOrders(fetchedOrders.orders || []);
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      alert("Failed to update order status. Please try again.");
+    }
+  }
 
   const removeOrderProduct = (index: number) => {
     setOrderProducts(orderProducts.filter((_, i) => i !== index));
@@ -121,9 +135,19 @@ const Orders: React.FC<any> = () => {
               <div>
                 <div className="font-medium text-lg">{order.customer}</div>
                 <div className="text-sm mt-1">
-                  <span className={`px-2 py-1 rounded ${getStatusColor(order.status)}`}>
-                    {order.status}
-                  </span>
+
+                    <select
+                    value={order.status}
+                    onChange={(e) => handleStatusChange(order.id, e.target.value as OrderStatus)}
+                    className={`px-2 py-1 rounded ${getStatusColor(order.status)}`}
+                    >
+                    <option value="PENDING">PENDING</option>
+                    <option value="INPROGRESS">INPROGRESS</option>
+                    <option value="COMPLETED">COMPLETED</option>
+                    <option value="DELIVERING">DELIVERING</option>
+                    <option value="DELIVERED">DELIVERED</option>
+                    <option value="CANCELED">CANCELED</option>
+                    </select>
                   <span className="mx-2">|</span>
                   <span>Total: ${order.bill.toFixed(2)}</span>
                   <span className="mx-2">|</span>
