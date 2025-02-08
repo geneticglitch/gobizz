@@ -2,7 +2,7 @@
 import { Button, Label, Modal, TextInput } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { get_items, create_item } from './server_actions';
+import { get_items, create_item, delete_item  } from './server_actions';
 
 const Items: React.FC<any> = () => {
   const { data: session } = useSession();
@@ -42,6 +42,22 @@ const Items: React.FC<any> = () => {
     const fetchedItems = await get_items(userId!);
     setItems(fetchedItems.items || []);
   };
+  const handleRemoveItem = async (itemId: string) => {
+    if (window.confirm("Are you sure you want to delete this item?")) {
+      try {
+        const response = await delete_item(itemId);
+        if (!response.success) {
+          alert(response.error);
+          return;
+        }
+        const fetchedItems = await get_items(userId!);
+        setItems(fetchedItems.items || []);
+      } catch (error) {
+        console.error("Error deleting item:", error);
+        alert("Failed to delete item. Please try again.");
+      }
+    }
+  };
 
   return (
     <div>
@@ -53,8 +69,31 @@ const Items: React.FC<any> = () => {
       <ul className="mt-4 space-y-2">
         {items.map((item) => (
           <li key={item.id} className="p-2 border rounded">
-            
-            {item.name} - {item.quantity} {item.unit} - ${item.totalCost.toFixed(2)}
+            <div className="grid grid-cols-4 ">
+              <div className="flex items-center justify-center">
+                <h2>{item.name}</h2>
+              </div>
+
+              <div className="flex items-center justify-center">
+                <h2>{item.quantity} {item.unit}</h2>
+              </div>
+
+              <div className="flex items-center justify-center">
+                <h2>${item.totalCost.toFixed(2)}</h2>
+                <Button color="red" onClick={() => handleRemoveItem(item.id)}>
+                  Remove
+              </Button>
+              </div>
+
+              <div className="flex items-center justify-end space-x-2">
+                <button className="text-blue-500 hover:text-blue-700">
+                  <i className="fas fa-edit"></i>
+                </button>
+                <button className="text-red-500 hover:text-red-700">
+                  <i className="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
           </li>
         ))}
       </ul>
@@ -98,9 +137,13 @@ const Items: React.FC<any> = () => {
           />
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={handleCreateItem}>Add</Button>
-          <Button color="gray" onClick={() => setIsModalOpen(false)}>Cancel</Button>
+        <Button onClick={handleCreateItem}>Add</Button>
+        <Button color="grey" onClick={() => setIsModalOpen(false)}>
+          Cancel
+          </Button>
         </Modal.Footer>
+        
+        
       </Modal>
     </div>
   );

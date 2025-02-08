@@ -35,7 +35,7 @@ const Products: React.FC<any> = () => {
   useEffect(() => {
     fetchItems();
   }
-    , []);
+  , []);
 
  
 

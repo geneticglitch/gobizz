@@ -86,7 +86,7 @@ const Orders: React.FC<any> = () => {
       updatedProducts[index] = { ...updatedProducts[index], quantity: value as number };
     }
     setOrderProducts(updatedProducts);
-    window.location.reload();
+    
   };
   
   type OrderStatus = "PENDING" | "INPROGRESS" | "COMPLETED" | "DELIVERING" | "DELIVERED" | "CANCELED";
