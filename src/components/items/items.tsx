@@ -13,6 +13,7 @@ const Items: React.FC<any> = () => {
   const [quantity, setQuantity] = useState<number>(1);
   const [unit, setUnit] = useState('');
   const [totalCost, setTotalCost] = useState<number>(0);
+  const [editingitem, setEditingItem] = useState<{ id: string; quantity: Number; totalCost: number} | null>(null);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -50,11 +51,12 @@ const Items: React.FC<any> = () => {
           alert(response.error);
           return;
         }
+        setItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
         const fetchedItems = await get_items(userId!);
         setItems(fetchedItems.items || []);
       } catch (error) {
         console.error("Error deleting item:", error);
-        alert("Failed to delete item. Please try again.");
+        alert("Failed to delete item because it is currently being used in a product.");
       }
     }
   };
@@ -69,7 +71,7 @@ const Items: React.FC<any> = () => {
       <ul className="mt-4 space-y-2">
         {items.map((item) => (
           <li key={item.id} className="p-2 border rounded">
-            <div className="grid grid-cols-4 ">
+            <div className="grid grid-cols-4 gap-4 items-center ">
               <div className="flex items-center justify-center">
                 <h2>{item.name}</h2>
               </div>
@@ -77,13 +79,18 @@ const Items: React.FC<any> = () => {
               <div className="flex items-center justify-center">
                 <h2>{item.quantity} {item.unit}</h2>
               </div>
-
               <div className="flex items-center justify-center">
-                <h2>${item.totalCost.toFixed(2)}</h2>
-                <Button color="red" onClick={() => handleRemoveItem(item.id)}>
-                  Remove
-              </Button>
+              <h2>${item.totalCost.toFixed(2)}</h2>
               </div>
+
+              <div className="flex items-center justify-end space-x-2">
+                  <Button color="red" onClick={() => handleRemoveItem(item.id)}>
+                    Remove
+                  </Button>
+            <button className="text-blue-500 hover:text-blue-700">
+             <i className="fas fa-edit"></i>
+            </button>
+          </div>
 
               <div className="flex items-center justify-end space-x-2">
                 <button className="text-blue-500 hover:text-blue-700">

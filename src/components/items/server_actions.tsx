@@ -45,3 +45,22 @@ export const delete_item = async (itemId: string) => {
     return { success: false, error: "Failed to delete item." };
   }
 }
+export const update_item = async (
+  itemId: string,
+  quantity: number,
+  totalCost: number
+) => {
+  try{
+    await prisma.item.update({
+      where: {id:itemId},
+      data: {
+        quantity,
+        totalCost,
+      },
+    });
+    return {success:true};
+  } catch (error) {
+    console.error("Error updating item:", error);
+    return {success: false, eroor:"Falied to update item."};
+  }
+};

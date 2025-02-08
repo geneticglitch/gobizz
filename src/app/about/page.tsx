@@ -1,114 +1,62 @@
 import React from 'react';
-// import './AboutPage.css'; // optional, if you want to keep styles separate
 
 const AboutPage: React.FC = () => {
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      {/* Main heading */}
-      <h1 style={{ marginBottom: '1rem' }}>How to use the Gobizz </h1>
-
-      {/* Top section with 3 columns: food images, order list, and map */}
+      {/* Top: Two images side by side */}
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem' }}>
-        {/* Left column: food images */}
+        <img
+          src="https://i.postimg.cc/Cxs2KsYk/Screenshot-2025-02-08-at-3-37-12-PM.png"
+          alt="Inventory Management"
+          style={{ width: '40%' }}
+        />
+        <img
+          src="https://i.postimg.cc/L5ktVvxV/Screenshot-2025-02-08-at-3-48-24-PM.png"
+          alt="Task"
+          style={{ width: '30%' }}
+        />
+      </div>
+
+      {/* Side-by-side: Inventory management + Track */}
+      <div style={{ display: 'flex', gap: '2rem', marginBottom: '2rem' }}>
+        {/* Inventory management column */}
         <div style={{ flex: 1 }}>
-          {/* You can replace these with real image URLs or imported images */}
-          <img
-            src="https://via.placeholder.com/300x200?text=Pizza+Image+1"
-            alt="Pizza dish"
-            style={{ width: '100%', marginBottom: '1rem' }}
-          />
-          <img
-            src="https://via.placeholder.com/300x200?text=Pizza+Image+2"
-            alt="Another dish"
-            style={{ width: '100%' }}
-          />
+          <h2><strong>Inventory management</strong></h2>
+          <p>
+            Gobizz is a smart inventory management solution designed specifically for the catering world.
+            Our solution enables restaurants, caterers, and food service providers to monitor ingredients, 
+            supplies, and dishes in real time. With an intuitive interface, Gobizz streamlines your operations 
+            by tracking every item from receipt to usage. This not only minimizes waste and reduces costs but 
+            also simplifies your ordering and replenishment processes. The system empowers you to maintain 
+            optimal stock levels and ensures that you always have the right ingredients at the right time, 
+            transforming inventory management into a strategic advantage.
+          </p>
         </div>
 
-        {/* Middle column: order list + button */}
-        <div style={{
-          flex: 1,
-          border: '1px solid #ddd',
-          borderRadius: '8px',
-          padding: '1rem',
-        }}>
-          <h2 style={{ marginTop: 0 }}>Your Order</h2>
-          <ul style={{ listStyleType: 'none', paddingLeft: 0, marginBottom: '1rem' }}>
-            <li>1 Avocado Toast</li>
-            <li>2 Mango Smoothies</li>
-            <li>1 Veggie Burger</li>
-          </ul>
-          <button
-            style={{
-              backgroundColor: '#3EBB41',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '4px',
-              padding: '0.75rem 1.5rem',
-              fontSize: '1rem',
-              cursor: 'pointer',
-            }}
-          >
-            Place Order
-          </button>
-        </div>
-
-        {/* Right column: map with ETA */}
-        <div style={{
-          flex: 1,
-          border: '1px solid #ddd',
-          borderRadius: '8px',
-          padding: '1rem',
-          position: 'relative'
-        }}>
-          <img
-            src="https://via.placeholder.com/300x200?text=Map+Image"
-            alt="Map showing route"
-            style={{ width: '100%', marginBottom: '1rem' }}
-          />
-          <div
-            style={{
-              position: 'absolute',
-              top: '1.5rem',
-              left: '55%',
-              backgroundColor: '#fff',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              padding: '0.5rem 1rem',
-            }}
-          >
-            <strong>3 min ETA</strong>
-          </div>
+        {/* Track column */}
+        <div style={{ flex: 1 }}>
+          <h2><strong>Track</strong></h2>
+          <p>
+            At the core of Gobizz’s functionality is a robust tracking system that meticulously monitors 
+            every movement within your inventory. From the moment ingredients enter your storage to 
+            the precise usage in your kitchen, our platform logs every transaction in real time. 
+            This comprehensive tracking provides you with accurate data on stock levels, expiration dates, 
+            and usage patterns, helping you make proactive decisions. With detailed analytics and timely alerts, 
+            our tracking system not only prevents shortages and overstock situations but also supports you in 
+            optimizing your overall operational efficiency, ensuring that your culinary creations are always 
+            backed by precise and reliable data.
+          </p>
         </div>
       </div>
 
-      {/* Bottom section with three steps: Browse, Order, Track */}
-      <div style={{ display: 'flex', gap: '2rem' }}>
-        <div style={{ flex: 1 }}>
-          <h2>Inventory</h2>
-          <p>
-            Gobizz has hundreds of restaurants to choose from. When you open the app,
-            you can scroll through for inspiration or search for a particular restaurant
-            or cuisine. When you find something you like, tap to add it to your order.
-          </p>
-        </div>
-        <div style={{ flex: 1 }}>
-          <h2>Order</h2>
-          <p>
-            When you’re ready to check out, you’ll see your address, an estimated
-            delivery time, and the price including tax and delivery fee. When everything
-            looks right, just tap <strong>Place order</strong>—and that’s it!
-          </p>
-        </div>
-        <div style={{ flex: 1 }}>
-          <h2>Track</h2>
-          <p>
-            Follow your order in the app. First you’ll see the restaurant accept and 
-            start prepping. Then, when the order’s almost ready, a nearby delivery 
-            person will head to the restaurant to pick it up. Next, they’ll drive or 
-            ride to you. You’ll be able to see their name and photo and track progress 
-            on the map.
-          </p>
-        </div>
+      {/* Upcoming features (Order) */}
+      <div>
+        <h3>Upcoming Features</h3>
+        <p>
+          We are actively working on an <strong>Order</strong> feature that will let you
+          place orders directly within Gobizz. Stay tuned for updates on how this new
+          functionality will further streamline and enhance your catering operations!
+        </p>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 'use server';
 
-import prisma  from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 
 export async function get_business(userId: string) {
     try {
@@ -26,6 +26,7 @@ export async function create_business(userId: string, data: any) {
         const updatedUser = await prisma.user.update({
             where: { id: userId },
             data: {
+                business_name: data.business_name,
                 business_description: data.business_description,
                 business_address: data.business_address,
                 business_phonenumber: data.business_phonenumber,

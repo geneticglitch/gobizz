@@ -141,9 +141,9 @@ const Products: React.FC<any> = () => {
                 <ul className="text-sm space-y-1 mt-1">
                   {product.productItems.map((pi: any) => (
                     <li key={pi.id} className="flex items-center justify-between">
-                      <span>{pi.item.name} - {pi.quantity} {pi.item.unit}</span>
+                      <span>{pi.item.name} - {pi.quantity} units</span>
                       <span className={`${pi.item.quantity >= pi.quantity ? 'text-green-600' : 'text-red-600'}`}>
-                        Available: {pi.item.quantity} {pi.item.unit}
+                        Available: {pi.item.quantity} units
                       </span>
                     </li>
                   ))}
