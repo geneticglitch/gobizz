@@ -1,9 +1,12 @@
 "use client"
 
 import React from 'react';
+import { useSession, signIn, signOut } from "next-auth/react";
+import Items from "@/components/items/items";
 
-const Dashboard = () => {
-    
+export default  function Dashbaord() {
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
   return (
     <div className="h-full flex p-8 gap-10">
   <div className="flex-1 bg-white text-black rounded-xl p-4 border border-white-800">
@@ -24,12 +27,10 @@ const Dashboard = () => {
     <div className="bg-white text-black rounded-lg p-4">
       <h2 className="text-2xl font-semibold">Items</h2>
       <p className="text-gray-light mt-4">
-        This is the bottom section of the right column, where you can display more data or components.
+        <Items userID />
       </p>
     </div>
   </div>
 </div>
   );
 };
-
-export default Dashboard;

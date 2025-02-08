@@ -33,25 +33,29 @@ model User {
   image     String   @default("/default.jpg")
   type      UserType
   business  Business?
+  items     Item[]
+  products  Product[]
+  orders    Order[]
 }
 
 model Business {
-  id       String   @id @default(cuid())
-  name     String
-  owner    User     @relation(fields: [ownerId], references: [id])
-  ownerId  String   @unique
-  items    Item[]
-  products Product[]
-  orders   Order[]
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  address     String?
+  phonenumber String
+  tags        String[] @default([])
+  owner       User?    @relation(fields: [ownerId], references: [id])
+  ownerId     String? @unique
 }
 
 model Item {
-  id          String       @id @default(cuid())
-  name        String
-  quantity    Float
-  unit        String       // Example: kg, g, liter
-  business    Business     @relation(fields: [businessId], references: [id])
-  businessId  String
+  id         String      @id @default(cuid())
+  name       String
+  quantity   Float
+  unit       String      // Example: kg, g, liter
+  user       User        @relation(fields: [userId], references: [id])
+  userId     String
   productItems ProductItem[]
 }
 
@@ -61,8 +65,8 @@ model Product {
   description String?
   price       Float
   important   Int
-  business    Business     @relation(fields: [businessId], references: [id])
-  businessId  String
+  user        User         @relation(fields: [userId], references: [id])
+  userId      String
   productItems ProductItem[]
   orderProducts OrderProduct[]
 }
@@ -81,8 +85,8 @@ model Order {
   customer    String
   createdAt   DateTime     @default(now())
   status      OrderStatus
-  business    Business     @relation(fields: [businessId], references: [id])
-  businessId  String
+  user        User         @relation(fields: [userId], references: [id])
+  userId      String
   orderProducts OrderProduct[]
   bill        Float
 }
